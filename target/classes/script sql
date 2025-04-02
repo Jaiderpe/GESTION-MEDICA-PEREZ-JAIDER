@@ -1,0 +1,82 @@
+CREATE DATABASE citas_medicas;
+
+USE citas_medicas;
+
+-- Tabla Paciente
+CREATE TABLE Paciente (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
+    direccion VARCHAR(255),
+    telefono VARCHAR(15),
+    email VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- Tabla Especialidad
+CREATE TABLE Especialidad (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL
+);
+
+-- Tabla Médico
+CREATE TABLE Medico (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    especialidad_id INT NOT NULL,
+    horario_inicio TIME NOT NULL,
+    horario_fin TIME NOT NULL,
+    FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id)
+);
+
+-- Tabla Cita
+CREATE TABLE Cita (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    paciente_id INT NOT NULL,
+    medico_id INT NOT NULL,
+    fecha_hora DATETIME NOT NULL,
+    estado ENUM('PENDIENTE', 'COMPLETADA', 'CANCELADA') DEFAULT 'PENDIENTE',
+    FOREIGN KEY (paciente_id) REFERENCES Paciente(id),
+    FOREIGN KEY (medico_id) REFERENCES Medico(id)
+);
+
+-- Tabla Usuario (Roles: ADMIN, MEDICO, PACIENTE)
+CREATE TABLE Usuario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    rol ENUM('ADMIN', 'MEDICO', 'PACIENTE', 'ESPECIALIDAD') NOT NULL
+);
+
+INSERT INTO Usuario (username, password, rol) VALUES
+('admin', 'admin123', 'ADMIN'),
+('medico1', 'medico123', 'MEDICO'),
+('paciente1', 'paciente123', 'PACIENTE');
+
+INSERT INTO Especialidad (nombre) VALUES
+('Cardiología'),
+('Dermatología'),
+('Pediatría'),
+('Ginecología'),
+('Oftalmología');
+
+INSERT INTO Medico (nombre, especialidad_id, horario_inicio, horario_fin) VALUES
+('Dr. Juan Pérez', 1, '08:00:00', '16:00:00'), -- Cardiología
+('Dra. Ana López', 2, '09:00:00', '17:00:00'), -- Dermatología
+('Dr. Carlos Ramírez', 3, '10:00:00', '18:00:00'), -- Pediatría
+('Dra. Laura Torres', 4, '08:30:00', '16:30:00'), -- Ginecología
+('Dr. Pedro Sánchez', 5, '09:30:00', '17:30:00'); -- Oftalmología
+
+INSERT INTO Paciente (nombre, apellido, fecha_nacimiento, direccion, telefono, email) VALUES
+('Carlos', 'García', '1990-05-15', 'Calle 123', '123456789', 'carlos@example.com'),
+('María', 'López', '1985-03-10', 'Calle 456', '987654321', 'maria@example.com'),
+('Javier', 'Martínez', '1975-12-20', 'Avenida 789', '555555555', 'javier@example.com'),
+('Sofía', 'Rodríguez', '1995-07-25', 'Plaza 321', '333333333', 'sofia@example.com'),
+('Luis', 'Fernández', '1980-11-05', 'Ruta 678', '777777777', 'luis@example.com');
+
+INSERT INTO Cita (paciente_id, medico_id, fecha_hora, estado) VALUES
+(1, 1, '2023-11-01 10:00:00', 'PENDIENTE'), -- Paciente 1 con Dr. Juan Pérez
+(2, 2, '2023-11-02 14:00:00', 'PENDIENTE'), -- Paciente 2 con Dra. Ana López
+(3, 3, '2023-11-03 09:30:00', 'COMPLETADA'), -- Paciente 3 con Dr. Carlos Ramírez
+(4, 4, '2023-11-04 11:00:00', 'CANCELADA'), -- Paciente 4 con Dra. Laura Torres
+(5, 5, '2023-11-05 16:00:00', 'PENDIENTE'); -- Paciente 5 con Dr. Pedro Sánchez
